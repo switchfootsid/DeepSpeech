@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import re
 
 # Constants
 SPACE_TOKEN = '<space>'
@@ -112,3 +113,25 @@ def levenshtein(a,b):
             current[j] = min(add, delete, change)
 
     return current[n]
+
+# Validate and normalize transcriptions. Returns a cleaned version of the label
+# or None if it's invalid.
+def validate_label(label):
+    # For now we can only handle [a-z ']
+    if "(" in label or \
+       "<" in label or \
+       "[" in label or \
+       "]" in label or \
+       "&" in label or \
+       "*" in label or \
+       re.search(r"[0-9]", label) != None:
+       return None
+    
+    label = label.replace("-", "")
+    label = label.replace("_", "")
+    label = label.replace(".", "")
+    label = label.replace(",", "")
+    label = label.replace("?", "")
+    label = label.strip()
+    
+    return label
